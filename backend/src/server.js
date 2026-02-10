@@ -11,7 +11,7 @@ import settingsRoutes from "./routes/settingsRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import cors from "cors";
-import path from 'path'
+import path from "path";
 
 dotenv.config();
 
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-if(process.env.NODE_ENV !== 'production'){
+if (process.env.NODE_ENV !== "production") {
   app.use(
     cors({
       origin: "http://localhost:5173",
@@ -43,11 +43,12 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/auth", authRoutes);
 
-if(process.env.NODE_ENV === 'production'){
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-  app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend','dist','index.html'));
+  // Fallback route for SPA - serve index.html for all non-API routes
+  app.use((req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
 
