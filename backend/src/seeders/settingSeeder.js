@@ -1,6 +1,6 @@
 import Settings from "../models/Settings.js";
 
-const seedSettings = async () => {
+export const seedSettings = async () => {
   await Settings.deleteMany();
 
   await Settings.create({
@@ -15,7 +15,4 @@ const seedSettings = async () => {
   });
 
   console.log("Settings seeded");
-  process.exit();
 };
-
-seedSettings();
