@@ -69,19 +69,19 @@ const Navigation = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden glass border-t border-border/50 animate-fade-in">
-          <div className="container mx-auto px-6 py-6 flex flex-col gap-4">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-lg animate-fade-in">
+          <div className="container mx-auto px-6 py-8 flex flex-col items-center gap-2">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-foreground hover:text-primary transition-colors py-2"
+                className="text-foreground hover:text-primary transition-colors py-3 text-center w-full"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
               </a>
             ))}
-            <Button asChild variant="hero" className="mt-4" onClick={() => setIsMobileMenuOpen(false)}>
+            <Button asChild variant="hero" className="mt-4 w-full max-w-[200px]" onClick={() => setIsMobileMenuOpen(false)}>
               <a href="#contact">Hire Me</a>
             </Button>
           </div>

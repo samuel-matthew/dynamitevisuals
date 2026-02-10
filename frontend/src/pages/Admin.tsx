@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link, Outlet, NavLink, useLocation } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  NavLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import {
   LayoutDashboard,
   FolderOpen,
@@ -13,6 +19,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/axios";
 import logo from "@/assets/logo.png";
 
 const menuItems = [
@@ -27,10 +34,23 @@ const menuItems = [
 const Admin = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout");
+      // Clear any stored auth data
+      localStorage.removeItem("token");
+      // Redirect to login
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   const getPageTitle = () => {
     const currentPath = location.pathname;
-    const item = menuItems.find(item => item.path === currentPath);
+    const item = menuItems.find((item) => item.path === currentPath);
     return item ? item.label : "Dashboard";
   };
 
@@ -38,8 +58,9 @@ const Admin = () => {
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-card border-r border-border transition-all duration-300 ${sidebarOpen ? "w-64" : "w-0 md:w-20"
-          }`}
+        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-card border-r border-border transition-all duration-300 ${
+          sidebarOpen ? "w-64" : "w-0 md:w-20"
+        }`}
       >
         <div
           className={`flex items-center gap-3 p-4 border-b border-border ${!sidebarOpen && "md:justify-center"}`}
@@ -61,9 +82,10 @@ const Admin = () => {
               to={item.path}
               end={item.exact}
               className={({ isActive }) =>
-                `w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                `w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 } ${!sidebarOpen && "md:justify-center md:px-2"}`
               }
             >
@@ -76,15 +98,14 @@ const Admin = () => {
         <div
           className={`p-4 border-t border-border ${!sidebarOpen && "md:flex md:justify-center"}`}
         >
-          <Link to="/">
-            <Button
-              variant="outline"
-              className={`w-full flex items-center gap-2 ${!sidebarOpen && "md:w-auto md:px-2"}`}
-            >
-              <LogOut className="w-4 h-4" />
-              {sidebarOpen && <span>Back to Site</span>}
-            </Button>
-          </Link>
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className={`w-full flex items-center gap-2 ${!sidebarOpen && "md:w-auto md:px-2"}`}
+          >
+            <LogOut className="w-4 h-4" />
+            {sidebarOpen && <span>Logout</span>}
+          </Button>
         </div>
       </aside>
 

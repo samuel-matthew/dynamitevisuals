@@ -1,32 +1,43 @@
-import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required: true,
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
     },
 
     email: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
 
     password: {
-        type: String,
-        required: true,
-        select: false,
+      type: String,
+      required: true,
+      select: false,
     },
 
     role: {
-        type: String,
-        enum: ["admin"],
-        default: "admin",
+      type: String,
+      enum: ["admin"],
+      default: "admin",
     },
-},
-{timestamps: true}
-)
 
+    // Password reset fields
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+
+    resetPasswordExpiry: {
+      type: Date,
+      default: null,
+    },
+  },
+  { timestamps: true },
+);
 
 // hash password before save
 userSchema.pre("save", async function () {
@@ -34,7 +45,6 @@ userSchema.pre("save", async function () {
 
   this.password = await bcrypt.hash(this.password, 10);
 });
-
 
 // compare password
 userSchema.methods.matchPassword = async function (enteredPassword) {

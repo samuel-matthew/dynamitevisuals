@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Save, Plus, X, Upload, ImageIcon } from "lucide-react";
+import { Save, Plus, X, Upload, ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { api } from "@/lib/axios";
 const AdminAbout = () => {
   const [aboutInfo, setAboutInfo] = useState<AboutInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const [newTool, setNewTool] = useState("");
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -65,6 +66,7 @@ const AdminAbout = () => {
 
   // 🔹 SAVE TO BACKEND
   const handleSave = async () => {
+    setSaving(true);
     try {
       const formData = new FormData();
 
@@ -90,6 +92,8 @@ const AdminAbout = () => {
         title: "Failed to save About info",
         variant: "destructive",
       });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -143,9 +147,13 @@ const AdminAbout = () => {
           <h1 className="text-3xl font-bold">About Me</h1>
           <p className="text-muted-foreground">Manage personal info</p>
         </div>
-        <Button onClick={handleSave} className="gap-2">
-          <Save className="w-4 h-4" />
-          Save Changes
+        <Button onClick={handleSave} className="gap-2" disabled={saving}>
+          {saving ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Save, Plus, X, Loader2, Play } from "lucide-react";
+import { Save, Plus, X, Loader2, Play, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,6 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { getSettings, updateSettings } from "@/lib/api/settings";
+import { api } from "@/lib/axios";
 import { Settings } from "@/types/models";
 
 const AdminSettings = () => {
@@ -26,6 +27,17 @@ const AdminSettings = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    oldPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -64,14 +76,14 @@ const AdminSettings = () => {
       const formData = new FormData();
 
       // Append text fields
-      formData.append('email', settings.email || '');
-      formData.append('phone', settings.phone || '');
-      formData.append('whatsapp', settings.whatsapp || '');
-      formData.append('socials', JSON.stringify(settings.socials || []));
+      formData.append("email", settings.email || "");
+      formData.append("phone", settings.phone || "");
+      formData.append("whatsapp", settings.whatsapp || "");
+      formData.append("socials", JSON.stringify(settings.socials || []));
 
       // Append showreel file if selected
       if (showreelFile) {
-        formData.append('showreel', showreelFile);
+        formData.append("showreel", showreelFile);
       }
 
       const updatedSettings = await updateSettings(formData);
@@ -115,6 +127,67 @@ const AdminSettings = () => {
     setSettings({ ...settings, socials: updatedSocials });
   };
 
+  const handleChangePassword = async () => {
+    // Validate inputs
+    if (
+      !passwordData.oldPassword ||
+      !passwordData.newPassword ||
+      !passwordData.confirmPassword
+    ) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in all password fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Password mismatch",
+        description: "New password and confirm password do not match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      toast({
+        title: "Weak password",
+        description: "New password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      await api.post("/auth/change-password", {
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+      });
+
+      setPasswordData({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      toast({
+        title: "Password changed successfully!",
+        description: "Your password has been updated.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error changing password",
+        description: error.response?.data?.message || "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
   const handleShowreelFile = (file: File | null) => {
     setShowreelFile(file);
 
@@ -145,7 +218,7 @@ const AdminSettings = () => {
     setIsDragging(false);
 
     const files = e.dataTransfer.files;
-    if (files && files[0] && files[0].type.startsWith('video/')) {
+    if (files && files[0] && files[0].type.startsWith("video/")) {
       handleShowreelFile(files[0]);
     } else {
       toast({
@@ -157,9 +230,11 @@ const AdminSettings = () => {
   };
 
   if (isLoading) {
-    return <div className="flex items-center justify-center p-12">
-      <Loader2 className="w-8 h-8 animate-spin text-primary" />
-    </div>
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -172,7 +247,11 @@ const AdminSettings = () => {
           </p>
         </div>
         <Button onClick={handleSave} className="gap-2" disabled={isSaving}>
-          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {isSaving ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
           Save Changes
         </Button>
       </div>
@@ -233,7 +312,9 @@ const AdminSettings = () => {
             {/* Current showreel or preview */}
             {(showreelPreview || settings.showreel?.url) && (
               <div className="space-y-2">
-                <Label>{showreelPreview ? "Preview" : "Current Showreel"}</Label>
+                <Label>
+                  {showreelPreview ? "Preview" : "Current Showreel"}
+                </Label>
                 <div className="relative aspect-video w-full max-w-md rounded-lg overflow-hidden bg-muted">
                   <video
                     src={showreelPreview || settings.showreel?.url}
@@ -256,10 +337,11 @@ const AdminSettings = () => {
 
             {/* Drag and drop zone */}
             <div
-              className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${isDragging
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
-                }`}
+              className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                isDragging
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -339,6 +421,135 @@ const AdminSettings = () => {
                 No social links added yet.
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Change Password */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Change Password</CardTitle>
+            <CardDescription>Update your account password</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="oldPassword">Old Password</Label>
+              <div className="relative">
+                <Input
+                  id="oldPassword"
+                  type={showPasswords.oldPassword ? "text" : "password"}
+                  placeholder="Enter your old password"
+                  value={passwordData.oldPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      oldPassword: e.target.value,
+                    })
+                  }
+                  disabled={isChangingPassword}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPasswords({
+                      ...showPasswords,
+                      oldPassword: !showPasswords.oldPassword,
+                    })
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPasswords.oldPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New Password</Label>
+              <div className="relative">
+                <Input
+                  id="newPassword"
+                  type={showPasswords.newPassword ? "text" : "password"}
+                  placeholder="Enter new password"
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      newPassword: e.target.value,
+                    })
+                  }
+                  disabled={isChangingPassword}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPasswords({
+                      ...showPasswords,
+                      newPassword: !showPasswords.newPassword,
+                    })
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPasswords.newPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showPasswords.confirmPassword ? "text" : "password"}
+                  placeholder="Confirm new password"
+                  value={passwordData.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                  disabled={isChangingPassword}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPasswords({
+                      ...showPasswords,
+                      confirmPassword: !showPasswords.confirmPassword,
+                    })
+                  }
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPasswords.confirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleChangePassword}
+              className="w-full"
+              disabled={isChangingPassword}
+            >
+              {isChangingPassword ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Update Password"
+              )}
+            </Button>
           </CardContent>
         </Card>
       </div>

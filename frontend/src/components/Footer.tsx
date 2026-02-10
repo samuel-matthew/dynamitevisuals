@@ -1,4 +1,5 @@
 import { ArrowUp } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -10,7 +11,12 @@ const Footer = () => {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           {/* Logo */}
-          <a href="#" className="font-display text-xl font-bold tracking-tight">
+          <a href="#" className="font-display flex items-center gap-2 text-xl font-bold tracking-tight">
+            <img
+              src={logo}
+              alt="DynamiteVisuals"
+              className="h-10 w-10 object-contain"
+            />
             <span className="text-gradient">Dynamite</span>
             <span className="text-foreground">Visuals</span>
           </a>

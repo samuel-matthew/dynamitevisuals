@@ -3,6 +3,8 @@ import { FolderOpen, MessageSquare, Eye, TrendingUp, Loader2 } from "lucide-reac
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProjects } from "@/lib/api/projects";
 import { getTestimonials } from "@/lib/api/testimonials";
+import { getContactStats } from "@/lib/api/contact";
+import { getAnalyticsStats } from "@/lib/api/analytics";
 import { Project, Testimonial } from "@/types/models";
 import { Link } from "react-router-dom";
 
@@ -51,9 +53,11 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [projectsData, testimonialsData] = await Promise.all([
+        const [projectsData, testimonialsData, contactStats, analyticsData] = await Promise.all([
           getProjects(),
           getTestimonials(),
+          getContactStats(),
+          getAnalyticsStats(),
         ]);
 
         setStats([
@@ -77,21 +81,21 @@ const AdminDashboard = () => {
           },
           {
             title: "Portfolio Views",
-            value: "2,847",
+            value: analyticsData.totalViews.toString(),
             icon: Eye,
-            change: "+12% from last month",
+            change: "All time views",
             color: "text-purple-500",
             bg: "bg-purple-500/10",
             link: "/",
           },
           {
             title: "Inquiries",
-            value: "24",
+            value: contactStats.total.toString(),
             icon: TrendingUp,
-            change: "+8 this month",
+            change: `+${contactStats.thisMonth} this month`,
             color: "text-orange-500",
             bg: "bg-orange-500/10",
-            link: "/admin/settings",
+            link: "/admin/inquiries",
           },
         ]);
 
@@ -175,8 +179,8 @@ const AdminDashboard = () => {
                     <p className="text-sm text-muted-foreground">{project.category}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${project.featured
-                      ? "bg-primary/10 text-primary"
-                      : "bg-muted text-muted-foreground"
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground"
                     }`}>
                     {project.featured ? "Featured" : "Standard"}
                   </span>
@@ -207,9 +211,9 @@ const AdminDashboard = () => {
               <Eye className="w-6 h-6 mx-auto mb-2 text-purple-500" />
               <span className="text-sm font-medium">View Site</span>
             </Link>
-            <Link to="/admin/settings" className="p-4 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 transition-colors text-center block">
+            <Link to="/admin/inquiries" className="p-4 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 transition-colors text-center block">
               <TrendingUp className="w-6 h-6 mx-auto mb-2 text-orange-500" />
-              <span className="text-sm font-medium">Analytics</span>
+              <span className="text-sm font-medium">Inquiries</span>
             </Link>
           </div>
         </CardContent>

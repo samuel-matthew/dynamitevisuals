@@ -89,10 +89,10 @@ const ServicesSection = () => {
                 </ul>
 
                 {/* CTA */}
-                <button className="flex items-center gap-2 text-primary text-sm font-medium group/btn">
+                {/* <a href="#contact" className="flex items-center gap-2 text-primary text-sm font-medium group/btn">
                   Learn More
                   <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                </button>
+                </a> */}
               </div>
             )
           })}
@@ -108,9 +108,11 @@ const ServicesSection = () => {
               Let's discuss how I can help bring your vision to life. Free
               consultation included.
             </p>
-            <Button variant="hero" size="lg">
-              Get a Free Quote
-              <ArrowRight className="w-4 h-4" />
+            <Button variant="hero" size="lg" asChild>
+              <a href="#contact">
+                Get a Free Quote
+                <ArrowRight className="w-4 h-4" />
+              </a>
             </Button>
           </div>
         </div>

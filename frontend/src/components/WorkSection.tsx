@@ -182,12 +182,12 @@ const WorkSection = () => {
                     </div>
                   )
                 )}
-                <button
+                {/* <button
                   onClick={() => setSelectedProject(null)}
                   className="absolute top-4 right-4 bg-black/50 p-2 rounded-full text-white hover:bg-black/70 transition-colors"
                 >
                   <X size={20} />
-                </button>
+                </button> */}
               </div>
 
               <div className="p-6 md:p-8">

@@ -8,8 +8,8 @@ export const aboutme = async (req, res) => {
     const about = await About.findOne();
     const user = await User.findOne();
     
-    console.log("DB Debug - User found:", user);
-    console.log("DB Debug - About found:", about);
+    // console.log("DB Debug - User found:", user);
+    // console.log("DB Debug - About found:", about);
 
     const aboutData = about ? about.toObject() : {};
 

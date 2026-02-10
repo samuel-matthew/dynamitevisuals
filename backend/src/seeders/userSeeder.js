@@ -7,7 +7,7 @@ const seedAdmin = async () => {
 
     await User.create({
       name: "Admin",
-      email: "admin@dynamitevisuals.com",
+      email: "samuelmatthew071@gmail.com",
       password: "password123"
     });
 
