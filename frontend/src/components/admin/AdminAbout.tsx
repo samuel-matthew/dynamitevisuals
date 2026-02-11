@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AboutInfo } from "@/types/models";
-import { getAboutInfo, updateAboutInfo } from "@/data/dbData";
+import { getAboutInfo, updateAboutInfo } from "@/lib/api/about";
 import { useToast } from "@/hooks/use-toast";
-import { api } from "@/lib/axios";
+
 
 const AdminAbout = () => {
   const [aboutInfo, setAboutInfo] = useState<AboutInfo | null>(null);
@@ -41,7 +41,13 @@ const AdminAbout = () => {
     fetchAbout();
   }, [toast]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
   if (!aboutInfo) return <p>No about data found</p>;
 
   // 🔹 IMAGE HANDLING

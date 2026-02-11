@@ -33,6 +33,14 @@ const Login = () => {
     setError("");
     setLoading(true);
 
+     if (loading) {
+        return (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        );
+      }
+
     try {
       const response = await api.post("/auth/login", {
         email,

@@ -6,7 +6,7 @@ export const getAboutInfo = async (): Promise<AboutInfo> => {
   return response.data;
 };
 
-export const updateAboutInfo = async (data: Partial<AboutInfo>): Promise<AboutInfo> => {
+export const updateAboutInfo = async (data: Partial<AboutInfo> | FormData): Promise<AboutInfo> => {
   const response = await api.put("/about", data);
   return response.data;
 };

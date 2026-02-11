@@ -6,7 +6,7 @@ export const getTestimonials = async (req, res) => {
     const testimonials = await Testimonial.find().sort({ createdAt: -1 });
     res.status(200).json(testimonials);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error retrieving testimonials' });
   }
 };
 
@@ -40,7 +40,7 @@ export const createTestimonial = async (req, res) => {
 
     res.status(201).json(newTestimonial);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error creating testimonial' });
   }
 };
 
@@ -84,7 +84,7 @@ export const updateTestimonial = async (req, res) => {
 
     res.status(200).json(updated);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error updating testimonial' });
   }
 };
 
@@ -106,7 +106,7 @@ export const deleteTestimonial = async (req, res) => {
 
     res.status(200).json({ message: "Testimonial deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error deleting testimonial' });
   }
 };
 

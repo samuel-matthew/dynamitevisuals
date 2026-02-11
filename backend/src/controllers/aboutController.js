@@ -14,12 +14,12 @@ export const aboutme = async (req, res) => {
     const aboutData = about ? about.toObject() : {};
 
     res.status(200).json({
-      name: user?.name || "Admin",
+      name: user?.name,
       ...aboutData,
     });
   } catch (error) {
-    console.error("Error in aboutme:", error);
-    res.status(500).json({ message: error.message });
+    // console.error("Error in aboutme:", error);
+    res.status(500).json({ message: `Failed to retrieve about information` });
   }
 };
 
@@ -98,8 +98,8 @@ export const updateAbout = async (req, res) => {
       ...about.toObject(),
     });
   } catch (error) {
-    console.error("Update about error:", error);
-    res.status(500).json({ message: error.message });
+    // console.error("Update about error:", error);
+    res.status(500).json({ message: 'Error updating about information' });
   }
 };
 

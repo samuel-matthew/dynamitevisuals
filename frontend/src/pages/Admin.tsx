@@ -58,7 +58,7 @@ const Admin = () => {
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-card border-r border-border transition-all duration-300 ${
+        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-card border-r border-border transition-all duration-300 overflow-hidden ${
           sidebarOpen ? "w-64" : "w-0 md:w-20"
         }`}
       >
@@ -71,7 +71,9 @@ const Admin = () => {
             className="w-10 h-10 object-contain"
           />
           {sidebarOpen && (
-            <span className="font-display font-bold text-lg">Admin</span>
+            <span className="font-display font-bold text-lg">
+              DynamiteVisuals
+            </span>
           )}
         </div>
 

@@ -7,7 +7,7 @@ export const getProjects = async (req, res) => {
     const projects = await Projects.find().sort({ createdAt: -1 });
     res.status(200).json(projects);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error retrieving projects' });
   }
 };
 
@@ -70,7 +70,7 @@ export const createProject = async (req, res) => {
     res.status(201).json(project);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error creating project' });
   }
 };
 
@@ -150,7 +150,7 @@ export const updateProject = async (req, res) => {
     res.status(200).json(project);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error updating project' });
   }
 };
 
@@ -195,6 +195,6 @@ export const deleteProject = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error deleting project' });
   }
 };

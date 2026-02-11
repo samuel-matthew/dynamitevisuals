@@ -5,8 +5,8 @@ export const seedAdmin = async () => {
     await User.deleteMany();
 
     await User.create({
-      name: "Admin",
-      email: "samuelmatthew071@gmail.com",
+      name: "Peter Udoh",
+      email: "dynamitevisuals1@gmail.com",
       password: "password123",
     });
 

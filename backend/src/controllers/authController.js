@@ -22,7 +22,7 @@ export const register = async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error registering user' });
   }
 };
 
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
 
     res.status(200).json({ message: "Login successful" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error logging in' });
     console.error(error);
   }
 };
@@ -72,7 +72,7 @@ export const logout = async (req, res) => {
 
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error logging out' });
   }
 };
 
@@ -124,7 +124,7 @@ export const changePassword = async (req, res) => {
 
     res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error changing password' });
     console.error(error);
   }
 };
@@ -239,7 +239,7 @@ export const resetPassword = async (req, res) => {
 
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error resetting password' });
     console.error(error);
   }
 };
