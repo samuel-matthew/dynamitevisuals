@@ -1,9 +1,16 @@
-import nodemailer from "nodemailer";
+import brevo from "@getbrevo/brevo";
 import Contact from "../models/Contact.js";
+
+// Initialize Brevo API
+const apiInstance = new brevo.TransactionalEmailsApi();
 
 export const sendEmail = async (req, res) => {
   try {
     const { name, email, subject, message, type } = req.body;
+
+    // Configure API key dynamically to ensure late binding
+    const apiKey = apiInstance.authentications['apiKey'];
+    apiKey.apiKey = process.env.BREVO_API_KEY;
 
     // Validate request body
     if (!name || !email || !message) {
@@ -21,67 +28,64 @@ export const sendEmail = async (req, res) => {
     });
     await contact.save();
 
-    // Configure Nodemailer transporter
-   const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+    // Prepare email content for Admin
+    const adminHtml = `
+      <h3>New Message Received</h3>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Subject:</strong> ${subject || "N/A"}</p>
+      <p><strong>Type:</strong> ${type || "General Message"}</p>
+      <br/>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `;
 
-
-    // Email content
-    const mailOptions = {
-      from: `"${name}" <${process.env.EMAIL_FROM || process.env.SMTP_USER}>`, // sender address
-      to: process.env.EMAIL_TO || process.env.EMAIL_USER, // list of receivers (admin)
-      subject: subject || `New ${type === "hire" ? "Hire Inquiry" : "Message"} from ${name}`, // Subject line
-      text: `
-        Name: ${name}
-        Email: ${email}
-        Subject: ${subject || "N/A"}
-        Type: ${type || "General Message"}
-        
-        Message:
-        ${message}
-      `,
-      html: `
-        <h3>New Message Received</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject || "N/A"}</p>
-        <p><strong>Type:</strong> ${type || "General Message"}</p>
-        <br/>
-        <p><strong>Message:</strong></p>
-        <p>${message}</p>
-      `,
+    // Configure Admin Email
+    const sendSmtpEmail = new brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = subject || `New ${type === "hire" ? "Hire Inquiry" : "Message"} from ${name}`;
+    sendSmtpEmail.htmlContent = adminHtml;
+    // Sender must be verified in Brevo. Using EMAIL_USER as safe default.
+    sendSmtpEmail.sender = { 
+      name: name, 
+      email: process.env.EMAIL_FROM || process.env.EMAIL_USER 
     };
+    sendSmtpEmail.to = [
+      { email: process.env.EMAIL_TO || process.env.EMAIL_USER, name: "Admin" }
+    ];
+    sendSmtpEmail.replyTo = { email: email, name: name };
 
     // Send email to admin
-    await transporter.sendMail(mailOptions);
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
 
-    // Confirmation email to user
-    const confirmationMailOptions = {
-      from: `"${process.env.EMAIL_FROM_NAME || "Dynamite Visuals"}" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "We've received your message!",
-      text: `Hi ${name},\n\nThanks for reaching out! We have received your message and will get back to you as soon as possible.\n\nBest regards,\nDynamite Visuals Team`,
-      html: `
-        <h3>Hi ${name},</h3>
-        <p>Thanks for reaching out! We have received your message and will get back to you as soon as possible.</p>
-        <br/>
-        <p>Best regards,</p>
-        <p><strong>Dynamite Visuals Team</strong></p>
-      `
+    // Prepare confirmation email content
+    const userHtml = `
+      <h3>Hi ${name},</h3>
+      <p>Thanks for reaching out! We have received your message and will get back to you as soon as possible.</p>
+      <br/>
+      <p>Best regards,</p>
+      <p><strong>Dynamite Visuals Team</strong></p>
+    `;
+
+    // Configure Confirmation Email
+    const sendConfirmationEmail = new brevo.SendSmtpEmail();
+    sendConfirmationEmail.subject = "We've received your message!";
+    sendConfirmationEmail.htmlContent = userHtml;
+    sendConfirmationEmail.sender = { 
+      name: process.env.EMAIL_FROM_NAME || "Dynamite Visuals", 
+      email: process.env.EMAIL_FROM || process.env.EMAIL_USER 
     };
+    sendConfirmationEmail.to = [{ email: email, name: name }];
 
-    await transporter.sendMail(confirmationMailOptions);
+    // Send confirmation email (don't block on error)
+    try {
+      await apiInstance.sendTransacEmail(sendConfirmationEmail);
+    } catch (confirmationError) {
+      console.warn("Failed to send confirmation email:", confirmationError.body || confirmationError.message);
+    }
 
     res.status(200).json({ message: "Email sent successfully!" });
   } catch (error) {
-    console.error("Email send error:", error);
+    console.error("Email send error:", error.body || error.message || error);
     res.status(500).json({ message: "Failed to send email. Please try again later." });
   }
 };
