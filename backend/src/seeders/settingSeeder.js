@@ -4,7 +4,7 @@ export const seedSettings = async () => {
   await Settings.deleteMany();
 
   await Settings.create({
-    email: "contact@dynamitevisuals.com",
+    email: "dynamitevisuals1@gmail.com",
     phone: "+234 703 105 5642",
     whatsapp: "+234 703 105 5642",
     socials: [

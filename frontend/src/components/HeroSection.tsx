@@ -46,7 +46,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full lg:pt-30">
+      <div className="relative z-10 w-full lg:pt-32">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-4xl mx-auto">
             {/* Pre-headline */}
