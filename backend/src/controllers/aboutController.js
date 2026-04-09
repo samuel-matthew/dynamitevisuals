@@ -7,9 +7,6 @@ export const aboutme = async (req, res) => {
   try {
     const about = await About.findOne();
     const user = await User.findOne();
-    
-    // console.log("DB Debug - User found:", user);
-    // console.log("DB Debug - About found:", about);
 
     const aboutData = about ? about.toObject() : {};
 
@@ -18,7 +15,6 @@ export const aboutme = async (req, res) => {
       ...aboutData,
     });
   } catch (error) {
-    // console.error("Error in aboutme:", error);
     res.status(500).json({ message: `Failed to retrieve about information` });
   }
 };
@@ -29,18 +25,18 @@ export const updateAbout = async (req, res) => {
     let aboutData = { ...aboutBody };
 
     // Parse JSON strings if they come from FormData
-    if (typeof aboutData.stats === 'string') {
+    if (typeof aboutData.stats === "string") {
       try {
         aboutData.stats = JSON.parse(aboutData.stats);
       } catch (e) {
-        console.error("Error parsing stats:", e);
+        // Invalid stats JSON, skip parsing
       }
     }
-    if (typeof aboutData.tools === 'string') {
+    if (typeof aboutData.tools === "string") {
       try {
         aboutData.tools = JSON.parse(aboutData.tools);
       } catch (e) {
-        console.error("Error parsing tools:", e);
+        // Invalid tools JSON, skip parsing
       }
     }
 
@@ -66,22 +62,17 @@ export const updateAbout = async (req, res) => {
         resource_type: "image",
       });
 
+      if (!uploadResult || !uploadResult.secure_url) {
+        throw new Error("Cloudinary upload failed - no URL returned");
+      }
+
       aboutData.profileImage = {
         url: uploadResult.secure_url,
         public_id: uploadResult.public_id,
       };
-    } 
-    // Handle image removal if explicitly requested (e.g., empty string sent for profileImage)
-    // Note: FormData append("profileImage", "") might result in empty string
-    else if (aboutData.profileImage === "" || aboutData.profileImage === "null") {
-        if (existingAbout?.profileImage?.public_id) {
-            await cloudinary.uploader.destroy(existingAbout.profileImage.public_id);
-        }
-        aboutData.profileImage = null; // or reset to default
     } else {
-        // If no file and no explicit removal, keep existing image
-        // prevent overwriting with undefined/null from spread
-        delete aboutData.profileImage;
+      // If no new file, don't modify existing profileImage
+      delete aboutData.profileImage;
     }
 
     const about = await About.findOneAndUpdate({}, aboutData, {
@@ -98,11 +89,9 @@ export const updateAbout = async (req, res) => {
       ...about.toObject(),
     });
   } catch (error) {
-    // console.error("Update about error:", error);
-    res.status(500).json({ message: 'Error updating about information' });
+    res.status(500).json({ message: "Error updating about information" });
   }
 };
-
 
 export const deleteAboutItem = async (req, res) => {
   try {
@@ -126,10 +115,7 @@ export const deleteAboutItem = async (req, res) => {
     if (!about) return res.json({ message: "About not found" });
 
     res.status(200).json(about);
-
-    
-
   } catch (error) {
-    res.status(500).json({message: 'Delete failed'})
+    res.status(500).json({ message: "Delete failed" });
   }
 };

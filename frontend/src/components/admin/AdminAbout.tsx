@@ -9,7 +9,6 @@ import { AboutInfo } from "@/types/models";
 import { getAboutInfo, updateAboutInfo } from "@/lib/api/about";
 import { useToast } from "@/hooks/use-toast";
 
-
 const AdminAbout = () => {
   const [aboutInfo, setAboutInfo] = useState<AboutInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +16,9 @@ const AdminAbout = () => {
 
   const [newTool, setNewTool] = useState("");
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null,
+  );
 
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -121,7 +122,7 @@ const AdminAbout = () => {
   const handleUpdateStat = (
     index: number,
     field: "label" | "value",
-    value: string
+    value: string,
   ) => {
     const stats = [...aboutInfo.stats];
     stats[index] = { ...stats[index], [field]: value };
@@ -206,7 +207,9 @@ const AdminAbout = () => {
                 <img
                   src={
                     profileImagePreview ||
-                    (typeof aboutInfo.profileImage === 'string' ? aboutInfo.profileImage : aboutInfo.profileImage?.url)
+                    (typeof aboutInfo.profileImage === "string"
+                      ? aboutInfo.profileImage
+                      : aboutInfo.profileImage?.url)
                   }
                   className="w-24 h-24 rounded object-cover"
                 />
@@ -252,17 +255,17 @@ const AdminAbout = () => {
               <div key={i} className="flex gap-2">
                 <Input
                   value={stat.label}
-                  onChange={(e) =>
-                    handleUpdateStat(i, "label", e.target.value)
-                  }
+                  onChange={(e) => handleUpdateStat(i, "label", e.target.value)}
                 />
                 <Input
                   value={stat.value}
-                  onChange={(e) =>
-                    handleUpdateStat(i, "value", e.target.value)
-                  }
+                  onChange={(e) => handleUpdateStat(i, "value", e.target.value)}
                 />
-                <Button size="icon" variant="ghost" onClick={() => handleRemoveStat(i)}>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => handleRemoveStat(i)}
+                >
                   <X />
                 </Button>
               </div>
